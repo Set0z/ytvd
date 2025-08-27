@@ -1,4 +1,4 @@
-﻿$pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+$pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $script:debug = $false
 $script:multiple_audio = $false
 
@@ -767,6 +767,7 @@ $comboRes.Add_SelectedIndexChanged({
             }
         }
     }
+
 
 }) #### готово
 
