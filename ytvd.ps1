@@ -276,7 +276,7 @@ $button_reset.Add_Click({
     $button_paste.Visible = 1
     $button_debug.Visible = $false
     $form.Size = New-Object System.Drawing.Size(500,95)
-
+    $textBox.Enabled = $true
     $comboLang.Visible = $false
     $label7.Visible = $false
     $comboRes.Visible = 0
@@ -287,7 +287,6 @@ $button_reset.Add_Click({
     $label4.Visible = 0
     $label5.Visible = 0
     $label6.Visible = 0
-    $textBox.ReadOnly = 1
     $form.Text = "Video Download"
 })            #### готово(перепроверить)
 
@@ -301,25 +300,40 @@ $button.Add_Click({
         [System.Windows.Forms.MessageBox]::Show("URL is empry!")
         return
     }
+
+    if (Test-Path $env:TEMP\videos.json) {
+        Remove-Item -Path "$env:TEMP\videos.json"
+    }
+
     try {
         if($script:yt_dlp_error -like $true){
             & "$script:yt_dlp_path" "--dump-single-json" $script:url >> "$env:TEMP\videos.json"
         } else {
             & "yt-dlp.exe" "--dump-single-json" $script:url >> "$env:TEMP\videos.json"
         }
+        
+        # Проверяем код возврата
+        if ($LASTEXITCODE -ne 0) {
+            throw "yt-dlp exited with code $LASTEXITCODE"
+        }
     }
     catch {
-        Write-Host "Ошибка при выполнении yt-dlp" -ForegroundColor Red
+        #Write-Host "Ошибка при выполнении yt-dlp: $($_.Exception.Message)" -ForegroundColor Red
+        #Write-Host "Детали ошибки: $($Error[0])" -ForegroundColor Yellow
+        
         $button.Text = "Search"
         [System.Windows.Forms.MessageBox]::Show(
-        "Invalid URL",
-        "Error",
-        [System.Windows.Forms.MessageBoxButtons]::OK,
-        [System.Windows.Forms.MessageBoxIcon]::Warning
+            "Invalid URL",
+            "Error",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
         )
+        Clear-Host
         $textBox.Text = ""
         return
     }
+
+
 
     $button_debug.Visible = $true
 
@@ -398,45 +412,9 @@ $button.Add_Click({
             }
         }
 
-        $textBox.ReadOnly = $true
+        $textBox.Enabled = $false
         $button_paste.Visible = $false
         $button_reset.Visible = $true
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     } else {
         # Обрабатываем форматы
@@ -552,7 +530,7 @@ $button.Add_Click({
         }
     }
 
-    $textBox.ReadOnly = $true
+    $textBox.Enabled = $false
     $button_paste.Visible = $false
     $button_reset.Visible = $true
     }
@@ -620,7 +598,7 @@ $button1.Add_Click({
         $label4.Visible = 0
         $label5.Visible = 0
         $label6.Visible = 0
-        $textBox.ReadOnly = 0
+        $textBox.Enabled = $true
         $button_paste.Visible = 1
         $button_reset.Visible = 0
         $form.Text = "Video download"
@@ -696,7 +674,7 @@ $button1.Add_Click({
         $label4.Visible = 0
         $label5.Visible = 0
         $label6.Visible = 0
-        $textBox.ReadOnly = 0
+        $textBox.Enabled = $true
         $button_paste.Visible = 1
         $button_reset.Visible = 0
         $form.Text = "Video download"
@@ -768,7 +746,6 @@ $comboRes.Add_SelectedIndexChanged({
         }
     }
 
-
 }) #### готово
 
 #Событие при выборе TBR
@@ -827,7 +804,6 @@ $comboLang.Add_SelectedIndexChanged({
 
 yt-dlp_test
 FFmpeg_test
-
 
 # Отображаем форму
 [void]$form.ShowDialog()
