@@ -570,7 +570,7 @@ $button1.Add_Click({
         $proc.StartInfo.CreateNoWindow = $true
 
         $proc.Start() | Out-Null
-
+        pause
         Clear-Host
         # Чтение в реальном времени, без блокировки
         while (-not $proc.HasExited -or -not $proc.StandardOutput.EndOfStream) {
