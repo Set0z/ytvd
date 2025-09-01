@@ -2,6 +2,7 @@
 $pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $script:debug = $false
 $script:multiple_audio = $false
+$script:yt_dlp_error = $false
 $IsRemoteInvocation = $false
 if ($PSScriptRoot -eq "") {$IsRemoteInvocation = $true}
 
@@ -222,6 +223,11 @@ function yt-dlp_test {
         $userPath = [Environment]::GetEnvironmentVariable("PATH", "User")
         $newPath = $userPath + ";" + $script:selectedPath
         [Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
+        $script:ffmpeg_test_Path = $script:selectedPath + "\ffmpeg.exe"
+    }
+    if (Test-Path $script:ffmpeg_test_Path) {
+        $script:ffmpeg_path = $script:selectedPath  + "\ffmpeg.exe"
+        $script:ffmpeg_is_in_path = $true
     }
 }
 
@@ -560,9 +566,9 @@ $button1.Add_Click({
         $proc = New-Object System.Diagnostics.Process
         if ($script:yt_dlp_error -like $true) {$proc.StartInfo.FileName = "$script:yt_dlp_path"} else {$proc.StartInfo.FileName = "yt-dlp.exe"}
         if ($IsRemoteInvocation -eq $true) {
-            if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id $script:url"} else {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id $script:url"}
+            if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f $id $script:url"} else {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f $id $script:url"}
         } else {
-            if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id $script:url"} else {$proc.StartInfo.Arguments = "-f $id $script:url"}
+            if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f $id $script:url"} else {$proc.StartInfo.Arguments = "-f $id $script:url"}
         }
         $proc.StartInfo.UseShellExecute = $false
         $proc.StartInfo.RedirectStandardOutput = $true
@@ -632,11 +638,11 @@ $button1.Add_Click({
         $proc = New-Object System.Diagnostics.Process
         if ($script:yt_dlp_error -like $true) {$proc.StartInfo.FileName = "$script:yt_dlp_path"} else {$proc.StartInfo.FileName = "yt-dlp.exe"}
         if ($IsRemoteInvocation -eq $true) {
-            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id+140 $script:url"}
-            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id+$audio_id $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f $id+140 $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f $id+$audio_id $script:url"}
         } else {
-            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-f $id+140 $script:url"}
-            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-f $id+$audio_id $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-f $id+140 $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-f $id+$audio_id $script:url"}
         }
         $proc.StartInfo.UseShellExecute = $false
         $proc.StartInfo.RedirectStandardOutput = $true
@@ -817,7 +823,10 @@ $comboLang.Add_SelectedIndexChanged({
 })#### готово
 
 yt-dlp_test
-FFmpeg_test
+if ($script:ffmpeg_is_in_path -ne $true) {
+    FFmpeg_test
+}
+
 
 # Отображаем форму
 [void]$form.ShowDialog()
