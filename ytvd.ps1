@@ -224,10 +224,10 @@ function yt-dlp_test {
         $newPath = $userPath + ";" + $script:selectedPath
         [Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
         $script:ffmpeg_test_Path = $script:selectedPath + "\ffmpeg.exe"
-    }
-    if (Test-Path $script:ffmpeg_test_Path) {
-        $script:ffmpeg_path = $script:selectedPath  + "\ffmpeg.exe"
-        $script:ffmpeg_is_in_path = $true
+        if (Test-Path $script:ffmpeg_test_Path) {
+            $script:ffmpeg_path = $script:selectedPath  + "\ffmpeg.exe"
+            $script:ffmpeg_is_in_path = $true
+        }
     }
 }
 
