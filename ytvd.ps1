@@ -1,4 +1,4 @@
-#123
+#
 $pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $script:debug = $false
 $script:multiple_audio = $false
@@ -543,15 +543,8 @@ $button.Add_Click({
 $button1.Add_Click({
 
     if ($IsRemoteInvocation = $true) {
-        $script:download_path = Folder-choose -text "Select video download location"
+        Folder-choose -text "Select video download location"
     }
-    Clear-Host
-    Write-Host "Путь: $script:download_path`n $script:selectedPath"
-    pause
-
-
-
-
 
     if (Test-TikTokUrl -Url $script:url){
         $selectedRes = $comboRes.SelectedItem
@@ -624,11 +617,6 @@ $button1.Add_Click({
     
         $form.Size = New-Object System.Drawing.Size(500,95)
 
-
-
-
-
-
     } else {
         $selectedRes = $comboRes.SelectedItem
         $selectedTBR = $comboTBR.SelectedItem
@@ -641,8 +629,13 @@ $button1.Add_Click({
 
         $proc = New-Object System.Diagnostics.Process
         if ($script:yt_dlp_error -like $true) {$proc.StartInfo.FileName = "$script:yt_dlp_path"} else {$proc.StartInfo.FileName = "yt-dlp.exe"}
-        if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-f $id+140 $script:url"}
-        if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-f $id+$audio_id $script:url"}
+        if ($IsRemoteInvocation = $true) {
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id+140 $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id+$audio_id $script:url"}
+        } else {
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-f $id+140 $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-f $id+$audio_id $script:url"}
+        }
         $proc.StartInfo.UseShellExecute = $false
         $proc.StartInfo.RedirectStandardOutput = $true
         $proc.StartInfo.RedirectStandardError = $true
