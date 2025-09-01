@@ -1,6 +1,8 @@
 $pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $script:debug = $false
 $script:multiple_audio = $false
+$IsRemoteInvocation = $true
+if ($PSScriptRoot -eq "") {$IsRemoteInvocation = $true}
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -183,12 +185,12 @@ function Test-TikTokUrl {
 function Folder-choose {
 
     param (
-        [bool]$default = $true
+        [string]$text = ""
     )
     Add-Type -AssemblyName System.Windows.Forms
     
     $folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
-    $(if ($default -eq $true) {$folderBrowser.Description = "Select a folder (if canceled, Downloads will be selected)"} else {$folderBrowser.Description = "Select a folder with yt-dlp.exe"})
+    $folderBrowser.Description = $text
     $folderBrowser.ShowNewFolderButton = $false
 
     if ($folderBrowser.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
@@ -214,7 +216,7 @@ function yt-dlp_test {
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Error
         )
-        Folder-choose -default $false
+        Folder-choose -text "Select a folder with yt-dlp.exe"
         $script:yt_dlp_path = $script:selectedPath + "\yt-dlp.exe"
         $userPath = [Environment]::GetEnvironmentVariable("PATH", "User")
         $newPath = $userPath + ";" + $script:selectedPath
@@ -237,7 +239,7 @@ function FFmpeg_test {
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Error
         )
-        Folder-choose -default $false
+        Folder-choose -text "Select a folder with ffmpeg.exe"
         $script:ffmpeg_path = $script:selectedPath  + "\ffmpeg.exe"
         $userPath = [Environment]::GetEnvironmentVariable("PATH", "User")
         $newPath = $userPath + ";" + $script:selectedPath
@@ -539,6 +541,18 @@ $button.Add_Click({
 #Событие нажатия на кнопку Download
 $button1.Add_Click({
 
+    if ($IsRemoteInvocation = $true) {
+        Folder-choose -text "Select video download location"
+        #$script:selectedPath
+    }
+    Clear-Host
+    $script:selectedPath
+    pause
+
+
+
+
+
     if (Test-TikTokUrl -Url $script:url){
         $selectedRes = $comboRes.SelectedItem
         $id = $script:videos | Where-Object { ($_.Resolution.ToString().Trim()) -ieq $selectedRes.ToString().Trim() } |Select-Object -ExpandProperty ID | Sort-Object -Unique -Descending
@@ -549,7 +563,11 @@ $button1.Add_Click({
 
         $proc = New-Object System.Diagnostics.Process
         if ($script:yt_dlp_error -like $true) {$proc.StartInfo.FileName = "$script:yt_dlp_path"} else {$proc.StartInfo.FileName = "yt-dlp.exe"}
-        if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id $script:url"} else {$proc.StartInfo.Arguments = "-f $id $script:url"}
+        if ($IsRemoteInvocation = $true) {
+            if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id $script:url"} else {$proc.StartInfo.Arguments = "-f $id $script:url"}
+        } else {
+            if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id $script:url"} else {$proc.StartInfo.Arguments = "-f $id $script:url"}
+        }
         $proc.StartInfo.UseShellExecute = $false
         $proc.StartInfo.RedirectStandardOutput = $true
         $proc.StartInfo.RedirectStandardError = $true
