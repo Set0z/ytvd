@@ -1,3 +1,4 @@
+#123
 $pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $script:debug = $false
 $script:multiple_audio = $false
@@ -542,11 +543,10 @@ $button.Add_Click({
 $button1.Add_Click({
 
     if ($IsRemoteInvocation = $true) {
-        Folder-choose -text "Select video download location"
-        #$script:selectedPath
+        $script:download_path = Folder-choose -text "Select video download location"
     }
     Clear-Host
-    $script:selectedPath
+    Write-Host "Путь: $script:download_path`n $script:selectedPath"
     pause
 
 
@@ -564,7 +564,7 @@ $button1.Add_Click({
         $proc = New-Object System.Diagnostics.Process
         if ($script:yt_dlp_error -like $true) {$proc.StartInfo.FileName = "$script:yt_dlp_path"} else {$proc.StartInfo.FileName = "yt-dlp.exe"}
         if ($IsRemoteInvocation = $true) {
-            if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id $script:url"} else {$proc.StartInfo.Arguments = "-f $id $script:url"}
+            if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id $script:url"} else {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id $script:url"}
         } else {
             if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id $script:url"} else {$proc.StartInfo.Arguments = "-f $id $script:url"}
         }
