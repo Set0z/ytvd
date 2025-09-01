@@ -2,8 +2,10 @@
 $pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $script:debug = $false
 $script:multiple_audio = $false
-$IsRemoteInvocation = $true
+$IsRemoteInvocation = $false
 if ($PSScriptRoot -eq "") {$IsRemoteInvocation = $true}
+$PSScriptRoot
+pause
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -268,7 +270,7 @@ function Format-FileSize {
 #Событие нажатия на кнопку Paste
 $button_paste.Add_Click({
     $textBox.Text = [System.Windows.Forms.Clipboard]::GetText()
-})            #### готово
+})
 
 #Событие нажатия на кнопку Reset
 $button_reset.Add_Click({
@@ -291,7 +293,7 @@ $button_reset.Add_Click({
     $label5.Visible = 0
     $label6.Visible = 0
     $form.Text = "Video Download"
-})            #### готово(перепроверить)
+})
 
 #Событие нажатия на кнопку Search
 $button.Add_Click({
@@ -537,7 +539,7 @@ $button.Add_Click({
     $button_paste.Visible = $false
     $button_reset.Visible = $true
     }
-})                  #### готово
+})
 
 #Событие нажатия на кнопку Download
 $button1.Add_Click({
@@ -545,6 +547,8 @@ $button1.Add_Click({
     if ($IsRemoteInvocation = $true) {
         Folder-choose -text "Select video download location"
     }
+
+    $button1.Text = "Downloading..."
 
     if (Test-TikTokUrl -Url $script:url){
         $selectedRes = $comboRes.SelectedItem
@@ -693,7 +697,7 @@ $button1.Add_Click({
     
         $form.Size = New-Object System.Drawing.Size(500,95)
     }
-})                 #### готово
+})
 
 #Событие нажатия на кнопку Debug
 $button_debug.Add_Click({
@@ -713,7 +717,7 @@ $button_debug.Add_Click({
         $script:debug = $false
         Clear-Host
     }
-})            #### готово
+})
 
 
 
@@ -757,7 +761,7 @@ $comboRes.Add_SelectedIndexChanged({
         }
     }
 
-}) #### готово
+})
 
 #Событие при выборе TBR
 $comboTBR.Add_SelectedIndexChanged({
@@ -806,7 +810,7 @@ $comboTBR.Add_SelectedIndexChanged({
         $label5.Text = $size
         $label6.Text = $resolution
     }
-}) #### готово
+})
 
 #Событие при выботе Language
 $comboLang.Add_SelectedIndexChanged({
