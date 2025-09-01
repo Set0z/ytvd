@@ -406,7 +406,7 @@ $button.Add_Click({
         $label6.Visible = 1
         $comboRes.Visible = 1
         $comboTBR.Visible = 1
-        $priority = @("1080x1920", "720x1280","640x1136","576x1024","480x854","360x640")
+        $priority = @("1920x1080", "1280x720", "1080x1920", "720x1280","640x1136","576x1024","480x854","360x640")
 
         foreach ($res in $priority) {
             if ($comboRes.Items -contains $res) {
@@ -551,7 +551,7 @@ $button1.Add_Click({
 
     if (Test-TikTokUrl -Url $script:url){
         $selectedRes = $comboRes.SelectedItem
-        $id = $script:videos | Where-Object { ($_.Resolution.ToString().Trim()) -ieq $selectedRes.ToString().Trim() } |Select-Object -ExpandProperty ID | Sort-Object -Unique -Descending
+        $id = $script:videos | Where-Object { $_.Resolution -ieq $selectedRes } |Select-Object -ExpandProperty ID | Sort-Object -Unique -Descending
         $button1.Text = "Downloading..."
         $button_reset.Enabled = $false 
         $button_debug.Visible = $false
@@ -570,7 +570,6 @@ $button1.Add_Click({
         $proc.StartInfo.CreateNoWindow = $true
 
         $proc.Start() | Out-Null
-        pause
         Clear-Host
         # Чтение в реальном времени, без блокировки
         while (-not $proc.HasExited -or -not $proc.StandardOutput.EndOfStream) {
@@ -645,7 +644,7 @@ $button1.Add_Click({
         $proc.StartInfo.CreateNoWindow = $true
 
         $proc.Start() | Out-Null
-
+        pause
         Clear-Host
         # Чтение в реальном времени, без блокировки
         while (-not $proc.HasExited -or -not $proc.StandardOutput.EndOfStream) {
