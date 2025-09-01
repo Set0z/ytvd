@@ -4,8 +4,6 @@ $script:debug = $false
 $script:multiple_audio = $false
 $IsRemoteInvocation = $false
 if ($PSScriptRoot -eq "") {$IsRemoteInvocation = $true}
-$PSScriptRoot
-pause
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -544,11 +542,12 @@ $button.Add_Click({
 #Событие нажатия на кнопку Download
 $button1.Add_Click({
 
-    if ($IsRemoteInvocation = $true) {
+    if ($IsRemoteInvocation -eq $true) {
         Folder-choose -text "Select video download location"
     }
 
     $button1.Text = "Downloading..."
+    $button1.Enabled = $false
 
     if (Test-TikTokUrl -Url $script:url){
         $selectedRes = $comboRes.SelectedItem
@@ -556,11 +555,11 @@ $button1.Add_Click({
         $button1.Text = "Downloading..."
         $button_reset.Enabled = $false 
         $button_debug.Visible = $false
-
+        Start-Sleep -Seconds 1
 
         $proc = New-Object System.Diagnostics.Process
         if ($script:yt_dlp_error -like $true) {$proc.StartInfo.FileName = "$script:yt_dlp_path"} else {$proc.StartInfo.FileName = "yt-dlp.exe"}
-        if ($IsRemoteInvocation = $true) {
+        if ($IsRemoteInvocation -eq $true) {
             if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id $script:url"} else {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id $script:url"}
         } else {
             if ($script:yt_dlp_error -like $true) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -f $id $script:url"} else {$proc.StartInfo.Arguments = "-f $id $script:url"}
@@ -629,11 +628,11 @@ $button1.Add_Click({
         $button1.Text = "Downloading..."
         $button_reset.Enabled = $false 
         $button_debug.Visible = $false
-    
+        Start-Sleep -Seconds 1
 
         $proc = New-Object System.Diagnostics.Process
         if ($script:yt_dlp_error -like $true) {$proc.StartInfo.FileName = "$script:yt_dlp_path"} else {$proc.StartInfo.FileName = "yt-dlp.exe"}
-        if ($IsRemoteInvocation = $true) {
+        if ($IsRemoteInvocation -eq $true) {
             if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id+140 $script:url"}
             if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location $script:ffmpeg_path -P $script:selectedPath -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-P $script:selectedPath -f $id+$audio_id $script:url"}
         } else {
@@ -697,6 +696,7 @@ $button1.Add_Click({
     
         $form.Size = New-Object System.Drawing.Size(500,95)
     }
+    $button1.Enabled = $true
 })
 
 #Событие нажатия на кнопку Debug
