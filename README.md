@@ -5,9 +5,10 @@
   <a href="#русский">🇷🇺 Ru</a>
 </p>
 
+<a id="english"></a>
 ---
 
-<h2 align="center">🇺🇸 English</h2> <a id="english"></a>
+<h2 align="center">🇺🇸 English</h2>
 <br>
 
 > 🚀 Quick Launch (no download needed)
@@ -54,9 +55,10 @@ It allows you to download videos from YouTube and TikTok.
   - Audio track language selection on YouTube.
 <br>
 
+<a id="русский"></a>
 ---
 
-<h2 align="center">🇷🇺 Русский</h2> <a id="русский"></a>
+<h2 align="center">🇷🇺 Русский</h2>
 <br>
 
 > 🚀 Быстрый запуск (без скачивания)
