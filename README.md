@@ -6,8 +6,9 @@
 </p>
 
 <a id="english"></a>
----
 
+---
+<br>
 <h2 align="center">🇺🇸 English</h2>
 <br>
 
@@ -55,9 +56,10 @@ It allows you to download videos from YouTube and TikTok.
   - Audio track language selection on YouTube.
 <br>
 
-<a id="русский"></a>
 ---
 
+<a id="русский"></a>
+<br>
 <h2 align="center">🇷🇺 Русский</h2>
 <br>
 
