@@ -14,7 +14,7 @@
 > You can run the program directly without downloading the file. Just execute this command in **PowerShell**:
 > 
 > ```powershell
-> irm https://raw.githubusercontent.com/Set0z/yt-dlp-powershell-GUI-video-download/refs/heads/main/ytvd.ps1 | iex
+> irm "https://raw.githubusercontent.com/Set0z/yt-dlp-powershell-GUI-video-download/refs/heads/main/ytvd.ps1" | iex
 > ```
 
 ---
@@ -63,7 +63,7 @@ It allows you to download videos from YouTube and TikTok.
 > Вы можете запустить программу прямо из интернета, не загружая файл. Просто выполните команду в PowerShell:
 > 
 > ```powershell
-> irm https://raw.githubusercontent.com/Set0z/yt-dlp-powershell-GUI-video-download/refs/heads/main/ytvd.ps1 | iex
+> irm "https://raw.githubusercontent.com/Set0z/yt-dlp-powershell-GUI-video-download/refs/heads/main/ytvd.ps1" | iex
 > ```
 
 ---
