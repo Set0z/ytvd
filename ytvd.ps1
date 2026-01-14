@@ -1,11 +1,13 @@
-#
+#region Глобальные переменные
 $pwshPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 $script:debug = $false
 $script:multiple_audio = $false
 $script:yt_dlp_error = $false
 $IsRemoteInvocation = $false
 if ($PSScriptRoot -eq "") {$IsRemoteInvocation = $true}
+#endregion
 
+#region Создание форм
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
@@ -19,6 +21,14 @@ $form.MaximizeBox = $false
 $form.MinimizeBox = $false
 $form.BackColor = [System.Drawing.Color]::FromArgb(1,46,110)
 $form.ForeColor = [System.Drawing.Color]::White
+
+# Создаем ProgressBar
+$progressBar = New-Object System.Windows.Forms.ProgressBar
+$progressBar.Location = New-Object System.Drawing.Point(20, 150)
+$progressBar.Size = New-Object System.Drawing.Size(450, 20)
+$progressBar.Minimum = 0
+$progressBar.Maximum = 100
+$form.Controls.Add($progressBar)
 
 # Создаем текстовое поле
 $textBox = New-Object System.Windows.Forms.TextBox
@@ -92,7 +102,7 @@ $form.Controls.Add($comboLang)
 # Создаем Label1
 $label1 = New-Object System.Windows.Forms.Label
 $label1.Location = New-Object System.Drawing.Point(59,50)
-$label1.Size = New-Object System.Drawing.Size(60,25)
+$label1.Size = New-Object System.Drawing.Size(60,15)
 $label1.Text = "Quality:"
 $label1.Visible = 0 #
 $label1.Font = New-Object System.Drawing.Font("Arial",8,[System.Drawing.FontStyle]::Regular)
@@ -101,33 +111,24 @@ $form.Controls.Add($label1)
 # Создаем Label2
 $label2 = New-Object System.Windows.Forms.Label
 $label2.Location = New-Object System.Drawing.Point(185,50)
-$label2.Size = New-Object System.Drawing.Size(80,25)
+$label2.Size = New-Object System.Drawing.Size(80,15)
 $label2.Text = "Total BitRate:"
 $label2.Visible = 0 #
 $label2.Font = New-Object System.Drawing.Font("Arial",8,[System.Drawing.FontStyle]::Regular)
 $form.Controls.Add($label2)
 
-# Создаем Label3
-$label3 = New-Object System.Windows.Forms.Label
-$label3.Location = New-Object System.Drawing.Point(316,50)
-$label3.Size = New-Object System.Drawing.Size(40,20)
-$label3.Text = "Size:"
-$label3.Visible = 0 #
-$label3.Font = New-Object System.Drawing.Font("Arial",8,[System.Drawing.FontStyle]::Regular)
-$form.Controls.Add($label3)
-
 # Создаем Label4
 $label4 = New-Object System.Windows.Forms.Label
-$label4.Location = New-Object System.Drawing.Point(390,50)
+$label4.Location = New-Object System.Drawing.Point(409,50)
 $label4.Size = New-Object System.Drawing.Size(80,20)
-$label4.Text = "Resolution:"
+$label4.Text = "Size:"
 $label4.Visible = 0 #
 $label4.Font = New-Object System.Drawing.Font("Arial",8,[System.Drawing.FontStyle]::Regular)
 $form.Controls.Add($label4)
 
 # Создаем Label5
 $label5 = New-Object System.Windows.Forms.Label
-$label5.Location = New-Object System.Drawing.Point(291,70)
+$label5.Location = New-Object System.Drawing.Point(380,68)
 $label5.Size = New-Object System.Drawing.Size(80,25)
 $label5.Text = "None"
 $label5.TextAlign = 'MiddleCenter'
@@ -135,15 +136,12 @@ $label5.Visible = 0 #
 $label5.Font = New-Object System.Drawing.Font("Arial",8,[System.Drawing.FontStyle]::Regular)
 $form.Controls.Add($label5)
 
-# Создаем Label6
-$label6 = New-Object System.Windows.Forms.Label
-$label6.Location = New-Object System.Drawing.Point(380,70)
-$label6.Size = New-Object System.Drawing.Size(80,25)
-$label6.Text = "None"
-$label6.TextAlign = 'MiddleCenter'
-$label6.Visible = 0 #
-$label6.Font = New-Object System.Drawing.Font("Arial",8,[System.Drawing.FontStyle]::Regular)
-$form.Controls.Add($label6)
+# Создаем CheckBox
+$checkBox = New-Object System.Windows.Forms.CheckBox
+$checkBox.Location = New-Object System.Drawing.Point(300,72)
+$checkBox.Text = "Audio Only"
+$checkBox.AutoSize = $true
+$form.Controls.Add($checkBox)
 
 # Создаем Label7
 $label7 = New-Object System.Windows.Forms.Label
@@ -153,7 +151,9 @@ $label7.Text = "Language:"
 $label7.Visible = 0 #
 $label7.Font = New-Object System.Drawing.Font("Arial",8,[System.Drawing.FontStyle]::Regular)
 $form.Controls.Add($label7)
+#endregion
 
+#region Функции
 #Проверка ссылки на TikTok
 function Test-TikTokUrl {
     param (
@@ -270,7 +270,9 @@ function Format-FileSize {
     # Округляем до двух знаков после запятой
     return "{0:N2} {1}" -f $sizeDecimal, $units[$i]
 }
+#endregion
 
+#region События
 #Событие нажатия на кнопку Paste
 $button_paste.Add_Click({
     $textBox.Text = [System.Windows.Forms.Clipboard]::GetText()
@@ -292,10 +294,8 @@ $button_reset.Add_Click({
     $comboTBR.Visible = 0
     $label1.Visible = 0
     $label2.Visible = 0
-    $label3.Visible = 0
     $label4.Visible = 0
     $label5.Visible = 0
-    $label6.Visible = 0
     $form.Text = "Video Download"
 })
 
@@ -316,9 +316,9 @@ $button.Add_Click({
 
     try {
         if($script:yt_dlp_error -like $true){
-            & "$script:yt_dlp_path" "--dump-single-json" $script:url >> "$env:TEMP\videos.json"
+            & "$script:yt_dlp_path" "--dump-single-json" "--no-warnings" $script:url >> "$env:TEMP\videos.json"
         } else {
-            & "yt-dlp.exe" "--dump-single-json" $script:url >> "$env:TEMP\videos.json"
+            & "yt-dlp.exe" "--dump-single-json" "--no-warnings" $script:url >> "$env:TEMP\videos.json"
         }
         
         # Проверяем код возврата
@@ -406,10 +406,8 @@ $button.Add_Click({
         $button1.Visible = 1
         $label1.Visible = 1
         $label2.Visible = 1
-        $label3.Visible = 1
         $label4.Visible = 1
         $label5.Visible = 1
-        $label6.Visible = 1
         $comboRes.Visible = 1
         $comboTBR.Visible = 1
         $priority = @("1920x1080", "1280x720", "1080x1920", "720x1280","640x1136","576x1024","480x854","360x640")
@@ -429,7 +427,7 @@ $button.Add_Click({
         # Обрабатываем форматы
         foreach ($format in $jsonContent.formats) {
             # Видео форматы MP4
-            if ($format.ext -eq "mp4" -and $format.vcodec -ne "none") {
+            if ($format.ext -eq "mp4" -and $format.vcodec -ne "none" -and $format.format_note -and $format.format_note -ne "(original)") {
                 $videoInfo = [PSCustomObject]@{
                     ID = $format.format_id
                     Resolution = $format.resolution
@@ -524,10 +522,8 @@ $button.Add_Click({
     $button1.Visible = 1
     $label1.Visible = 1
     $label2.Visible = 1
-    $label3.Visible = 1
     $label4.Visible = 1
     $label5.Visible = 1
-    $label6.Visible = 1
     $comboRes.Visible = 1
     $comboTBR.Visible = 1
     $priority = @("1080p60","1080p","720p60","720p","480p","360p","240p","144p")
@@ -611,12 +607,11 @@ $button1.Add_Click({
         $button_reset.Enabled = $true
         $button_debug.Visible = $false
         $comboRes.Visible = 0
+        $checkBox.Checked = $false
         $label1.Visible = 0
         $label2.Visible = 0
-        $label3.Visible = 0
         $label4.Visible = 0
         $label5.Visible = 0
-        $label6.Visible = 0
         $textBox.Enabled = $true
         $button_paste.Visible = 1
         $button_reset.Visible = 0
@@ -634,15 +629,19 @@ $button1.Add_Click({
         $button_reset.Enabled = $false 
         $button_debug.Visible = $false
         Start-Sleep -Seconds 1
-
+        
         $proc = New-Object System.Diagnostics.Process
         if ($script:yt_dlp_error -like $true) {$proc.StartInfo.FileName = "$script:yt_dlp_path"} else {$proc.StartInfo.FileName = "yt-dlp.exe"}
         if ($IsRemoteInvocation -eq $true) {
-            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f $id+140 $script:url"}
-            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f $id+$audio_id $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false) -and (-not ($checkBox.Checked))) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f $id+140 -o `"%(title)s.%(ext)s`" $script:url"} elseif (($script:multiple_audio -like $false) -and (-not ($checkBox.Checked))) {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f $id+140 -o `"%(title)s.%(ext)s`" $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true) -and (-not ($checkBox.Checked))) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f $id+$audio_id -o `"%(title)s.%(ext)s`" $script:url"} elseif (($script:multiple_audio -like $true) -and (-not ($checkBox.Checked))) {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f $id+$audio_id -o `"%(title)s.%(ext)s`" $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false) -and ($checkBox.Checked)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f 140 -o `"%(title)s.%(ext)s`" $script:url"} elseif (($script:multiple_audio -like $false) -and ($checkBox.Checked)) {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f 140 -o `"%(title)s.%(ext)s`" $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true) -and ($checkBox.Checked)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -P `"$script:selectedPath`" -f $audio_id -o `"%(title)s.%(ext)s`" $script:url"} elseif (($script:multiple_audio -like $true) -and ($checkBox.Checked)) {$proc.StartInfo.Arguments = "-P `"$script:selectedPath`" -f $audio_id -o `"%(title)s.%(ext)s`" $script:url"}
         } else {
-            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f $id+140 $script:url"} elseif ($script:multiple_audio -like $false) {$proc.StartInfo.Arguments = "-f $id+140 $script:url"}
-            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f $id+$audio_id $script:url"} elseif ($script:multiple_audio -like $true) {$proc.StartInfo.Arguments = "-f $id+$audio_id $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false) -and (-not ($checkBox.Checked))) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f $id+140 -o `"%(title)s.%(ext)s`" $script:url"} elseif (($script:multiple_audio -like $false) -and (-not ($checkBox.Checked))) {$proc.StartInfo.Arguments = "-f $id+140 -o `"%(title)s.%(ext)s`" $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true) -and (-not ($checkBox.Checked))) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f $id+$audio_id -o `"%(title)s.%(ext)s`" $script:url"} elseif (($script:multiple_audio -like $true) -and (-not ($checkBox.Checked))) {$proc.StartInfo.Arguments = "-f $id+$audio_id -o `"%(title)s.%(ext)s`" $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $false) -and ($checkBox.Checked)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f 140 -o `"%(title)s.%(ext)s`" $script:url"} elseif (($script:multiple_audio -like $false) -and ($checkBox.Checked)) {$proc.StartInfo.Arguments = "-f 140 -o `"%(title)s.%(ext)s`" $script:url"}
+            if (($script:yt_dlp_error -like $true) -and ($script:multiple_audio -like $true) -and ($checkBox.Checked)) {$proc.StartInfo.Arguments = "--ffmpeg-location `"$script:ffmpeg_path`" -f $audio_id -o `"%(title)s.%(ext)s`" $script:url"} elseif (($script:multiple_audio -like $true) -and ($checkBox.Checked)) {$proc.StartInfo.Arguments = "-f $audio_id -o `"%(title)s.%(ext)s`" $script:url"}
         }
         $proc.StartInfo.UseShellExecute = $false
         $proc.StartInfo.RedirectStandardOutput = $true
@@ -659,7 +658,7 @@ $button1.Add_Click({
     
                 if ($line) {
                     # Проверка на ключевые слова
-                if ($line -match "Destination" -or $line -match "\[Merger\]" -or $line -match "Deleting" -or $line -match "has already been downloaded") {
+                if ($line -match "Destination" -or $line -match "\[Merger\]" -or $line -match "\[FixupM4a\]" -or $line -match "Deleting" -or $line -match "has already been downloaded") {
                         # Конвертация строки в CP1251
                     $bytes = [System.Text.Encoding]::GetEncoding(866).GetBytes($line)
                     $lineCP1251 = [System.Text.Encoding]::GetEncoding(1251).GetString($bytes)
@@ -687,12 +686,11 @@ $button1.Add_Click({
         $button_debug.Visible = $false
         $comboRes.Visible = 0
         $comboTBR.Visible = 0
+        $checkBox.Checked = $false
         $label1.Visible = 0
         $label2.Visible = 0
-        $label3.Visible = 0
         $label4.Visible = 0
         $label5.Visible = 0
-        $label6.Visible = 0
         $textBox.Enabled = $true
         $button_paste.Visible = 1
         $button_reset.Visible = 0
@@ -724,7 +722,24 @@ $button_debug.Add_Click({
     }
 })
 
-
+#Событие нажатия на галочку
+$checkBox.Add_CheckedChanged({
+    if ($checkBox.Checked) {
+        $comboRes.Enabled = $false
+        $comboTBR.Enabled = $false
+        $script:old_size = $label5.Text
+        $audio_id_size = $script:audios | Where-Object { $_.FormatNote -eq $script:selectedLang -and $_.ID -like '140-*' -and $_.ID -notlike '140-drc*' } | Select-Object -ExpandProperty ID
+        if($script:multiple_audio){
+            $label5.Text = "~ " + $(Format-FileSize $($script:audios | Where-Object { ($_.ID.ToString().Trim()) -ieq "$($audio_id_size)" } |Select-Object -ExpandProperty Raw_size))
+        }else{
+            $label5.Text = "~ " + $(Format-FileSize $($script:audios | Where-Object { ($_.ID.ToString().Trim()) -ieq "140" } |Select-Object -ExpandProperty Raw_size))
+        }
+    } else {
+        $comboRes.Enabled = $true
+        $comboTBR.Enabled = $true
+        $label5.Text = $script:old_size
+    }
+})
 
 
 #Событие при выборе Resolution
@@ -787,7 +802,6 @@ $comboTBR.Add_SelectedIndexChanged({
             Write-Host "Resolution: $selectedRes `nTBR: $selectedTBR `nSize: $size_display`n" -NoNewline
         }
         $label5.Text = $size
-        $label6.Text = $resolution
 
     } else {
         $selectedRes = $comboRes.SelectedItem
@@ -813,7 +827,6 @@ $comboTBR.Add_SelectedIndexChanged({
             if ($script:multiple_audio -like $true){ Write-Host "Language: $script:selectedLang" }
         }
         $label5.Text = $size
-        $label6.Text = $resolution
     }
 })
 
@@ -821,12 +834,20 @@ $comboTBR.Add_SelectedIndexChanged({
 $comboLang.Add_SelectedIndexChanged({
     $script:selectedLang = $comboLang.SelectedItem
 })#### готово
+#endregion
+
+
+
+
+
+
+
+
 
 yt-dlp_test
 if ($script:ffmpeg_is_in_path -ne $true) {
     FFmpeg_test
 }
-
 
 # Отображаем форму
 [void]$form.ShowDialog()
