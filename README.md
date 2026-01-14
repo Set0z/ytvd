@@ -29,7 +29,7 @@ It allows you to download videos from YouTube and TikTok.
 
   ✅ On YouTube, if multiple audio tracks are available, you can choose the language.
 
-  ✅ Works only with YouTube and TikTok, because: "i'm too lazy to finish the code".
+  ✅ Works only with YouTube and TikTok.
 
   ---
 
@@ -80,7 +80,7 @@ It allows you to download videos from YouTube and TikTok.
 
   ✅ На YouTube при наличии нескольких звуковых дорожек можно выбрать язык.
 
-  ✅ Работает только с YouTube и TikTok, потому что: "мне лень дописывать код".
+  ✅ Работает только с YouTube и TikTok.
 
 ---
 
