@@ -22,14 +22,6 @@ $form.MinimizeBox = $false
 $form.BackColor = [System.Drawing.Color]::FromArgb(1,46,110)
 $form.ForeColor = [System.Drawing.Color]::White
 
-# Создаем ProgressBar
-$progressBar = New-Object System.Windows.Forms.ProgressBar
-$progressBar.Location = New-Object System.Drawing.Point(20, 150)
-$progressBar.Size = New-Object System.Drawing.Size(450, 20)
-$progressBar.Minimum = 0
-$progressBar.Maximum = 100
-$form.Controls.Add($progressBar)
-
 # Создаем текстовое поле
 $textBox = New-Object System.Windows.Forms.TextBox
 $textBox.Location = New-Object System.Drawing.Point(20,20)
