@@ -25,11 +25,11 @@
 <br>
 
 This project is a GUI built with PowerShell and Windows Forms.
-It allows you to download videos from YouTube and TikTok.
+It allows you to download videos from YouTubek.
 
   ✅ On YouTube, if multiple audio tracks are available, you can choose the language.
 
-  ✅ Works only with YouTube and TikTok.
+  ✅ Works only with YouTube.
 
   ---
 
@@ -51,7 +51,7 @@ It allows you to download videos from YouTube and TikTok.
 
   - Simple graphical interface (no need to use the console).
 
-  - Download from YouTube and TikTok.
+  - Download from YouTube.
 
   - Audio track language selection on YouTube.
 <br>
@@ -76,11 +76,11 @@ It allows you to download videos from YouTube and TikTok.
 <br>
 
 Этот проект — это GUI, сделанный на PowerShell с использованием Windows Forms.
-Он позволяет скачивать видео с YouTube и TikTok.
+Он позволяет скачивать видео с YouTube.
 
   ✅ На YouTube при наличии нескольких звуковых дорожек можно выбрать язык.
 
-  ✅ Работает только с YouTube и TikTok.
+  ✅ Работает только с YouTube.
 
 ---
 
@@ -102,6 +102,6 @@ It allows you to download videos from YouTube and TikTok.
 
   - Простой графический интерфейс (не нужно пользоваться консолью).
 
-  - Скачивание с YouTube и TikTok.
+  - Скачивание с YouTube.
 
   - Возможность выбора языка аудиодорожки на YouTube.
