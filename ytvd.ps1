@@ -419,7 +419,7 @@ $button.Add_Click({
         # Обрабатываем форматы
         foreach ($format in $jsonContent.formats) {
             # Видео форматы MP4
-            if ($format.ext -eq "mp4" -and $format.vcodec -ne "none" -and $format.format_note -and $format.format_note -ne "(original)") {
+            if ($format.ext -eq "mp4" -and $format.vcodec -ne "none" -and $format.format_note -and $format.format_note -ne "(original)" -and $format.format_note -ne "(default)") {
                 $videoInfo = [PSCustomObject]@{
                     ID = $format.format_id
                     Resolution = $format.resolution
